@@ -57,12 +57,13 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ message: 'Confirmação bem-sucedida!', data: newConfirmation }, { status: 201 });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('API POST Error:', error);
         if (error instanceof SyntaxError) {
              return NextResponse.json({ message: 'Formato JSON inválido no corpo da requisição.' }, { status: 400 });
         }
-        return NextResponse.json({ message: error.message || 'Erro Interno do Servidor' }, { status: 500 });
+        const message = error instanceof Error ? error.message : 'Erro Interno do Servidor';
+        return NextResponse.json({ message }, { status: 500 });
     }
 }
 
@@ -104,9 +105,10 @@ export async function GET(request: NextRequest) {
             return NextResponse.json(eventList, { status: 200 });
         }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('API GET Error:', error);
-        return NextResponse.json({ message: error.message || 'Erro Interno do Servidor ao buscar dados.' }, { status: 500 });
+        const message = error instanceof Error ? error.message : 'Erro Interno do Servidor ao buscar dados.';
+        return NextResponse.json({ message }, { status: 500 });
     }
 }
 
@@ -141,9 +143,10 @@ export async function DELETE(request: NextRequest) {
 
         return NextResponse.json({ message: 'Confirmação excluída com sucesso.' }, { status: 200 });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('API DELETE Error:', error);
-        return NextResponse.json({ message: error.message || 'Erro Interno do Servidor ao excluir.' }, { status: 500 });
+        const message = error instanceof Error ? error.message : 'Erro Interno do Servidor ao excluir.';
+        return NextResponse.json({ message }, { status: 500 });
     }
 }
 
@@ -187,11 +190,12 @@ export async function PUT(request: NextRequest) {
         const updatedConfirmation = result.rows[0] as Confirmation;
         return NextResponse.json({ message: 'Confirmação atualizada com sucesso.', data: updatedConfirmation }, { status: 200 });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('API PUT Error:', error);
          if (error instanceof SyntaxError) {
              return NextResponse.json({ message: 'Formato JSON inválido no corpo da requisição.' }, { status: 400 });
         }
-        return NextResponse.json({ message: error.message || 'Erro Interno do Servidor ao atualizar.' }, { status: 500 });
+        const message = error instanceof Error ? error.message : 'Erro Interno do Servidor ao atualizar.';
+        return NextResponse.json({ message }, { status: 500 });
     }
 } 

@@ -4,12 +4,14 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 
 // Same interface as in API
+/* Removed unused Confirmation import
 interface Confirmation {
     id: string;
     name: string;
     guests: number;
     confirmedAt: string;
 }
+*/
 
 // Interface for event details fetched from API
 interface EventDetails {
@@ -56,9 +58,11 @@ export default function ConfirmPage() {
                 } else {
                      throw new Error("Detalhes do evento não encontrados na resposta da API.");
                 }
-            } catch (err: any) {
+            } catch (err: unknown) {
                 console.error("Failed to fetch event details:", err);
-                setEventError(err.message || "Falha ao carregar informações do evento.");
+                 // Type check before accessing message
+                const message = err instanceof Error ? err.message : "Falha ao carregar informações do evento.";
+                setEventError(message);
             } finally {
                 setIsLoadingEvent(false);
             }
@@ -101,9 +105,11 @@ export default function ConfirmPage() {
             console.log('API Response:', result);
             setSubmitted(true);
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Submission error:', err);
-            setSubmitError(err.message || 'Ocorreu um erro. Por favor, tente novamente.');
+            // Type check before accessing message
+            const message = err instanceof Error ? err.message : 'Ocorreu um erro. Por favor, tente novamente.';
+            setSubmitError(message);
         } finally {
             setIsSubmitting(false);
         }

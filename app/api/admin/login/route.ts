@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 
 const adminPassword = process.env.ADMIN_PASSWORD;
 const authCookieName = 'admin-auth'; // Same name as in middleware

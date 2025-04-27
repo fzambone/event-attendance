@@ -75,9 +75,11 @@ export default function AdminAttendancePage() {
                  setSelectedEventId('');
             }
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Failed to fetch event list:", err);
-            setError(err.message || "Falha ao carregar lista de eventos.");
+            // Type check before accessing message
+            const message = err instanceof Error ? err.message : "Falha ao carregar lista de eventos.";
+            setError(message);
         } finally {
             setLoadingEvents(false);
         }
@@ -112,9 +114,11 @@ export default function AdminAttendancePage() {
             const data: { details: EventDetails, confirmations: Confirmation[] } = await response.json();
             setConfirmations(data.confirmations || []);
             setSelectedEventDetails(data.details || null);
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error(`Failed to fetch confirmations for ${selectedEventId}:`, err);
-            setError(err.message || `Falha ao carregar confirmações para o evento selecionado.`);
+            // Type check before accessing message
+             const message = err instanceof Error ? err.message : `Falha ao carregar confirmações para o evento selecionado.`;
+            setError(message);
         } finally {
             setLoadingConfirmations(false);
         }
@@ -174,9 +178,11 @@ export default function AdminAttendancePage() {
             setShowCreateForm(false); // Hide form on success
             await fetchEventList(result.eventId); // Refresh list and select the new event
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Create event failed:", err);
-            setCreateEventError(err.message || "Ocorreu um erro ao criar o evento.");
+             // Type check before accessing message
+             const message = err instanceof Error ? err.message : "Ocorreu um erro ao criar o evento.";
+            setCreateEventError(message);
         } finally {
             setIsCreatingEvent(false);
         }
@@ -211,9 +217,11 @@ export default function AdminAttendancePage() {
             console.log("Event deleted:", result.message);
             await fetchEventList(); // Refresh list
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Delete event failed:", err);
-            setError(err.message || "Ocorreu um erro ao excluir o evento."); // Show error in main error area
+            // Type check before accessing message
+            const message = err instanceof Error ? err.message : "Ocorreu um erro ao excluir o evento.";
+            setError(message); // Show error in main error area
         } finally {
             setIsDeletingEvent(false);
         }
@@ -233,9 +241,11 @@ export default function AdminAttendancePage() {
                 throw new Error(errorData.message || 'Falha ao excluir confirmação.');
             }
             setConfirmations(prev => prev.filter(c => c.id !== confirmationId));
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Delete failed:", err);
-            setError(err.message || "Ocorreu um erro ao excluir.");
+            // Type check before accessing message
+             const message = err instanceof Error ? err.message : "Ocorreu um erro ao excluir.";
+            setError(message);
         }
     };
 
@@ -267,9 +277,11 @@ export default function AdminAttendancePage() {
             const updatedConfirmationData = await response.json();
             setConfirmations(prev => prev.map(c => (c.id === confirmationId ? updatedConfirmationData.data : c)));
             setEditingId(null);
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Save edit failed:", err);
-            setError(err.message || "Ocorreu um erro ao salvar as alterações.");
+            // Type check before accessing message
+             const message = err instanceof Error ? err.message : "Ocorreu um erro ao salvar as alterações.";
+            setError(message);
         } finally {
             setIsSubmittingEdit(false);
         }
@@ -278,7 +290,7 @@ export default function AdminAttendancePage() {
     // --- Helper ---
     const formatDate = (dateString: string) => {
          try { return new Date(dateString).toLocaleString('pt-BR', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Sao_Paulo' }); }
-         catch (e) { return 'Data Inválida'; }
+         catch /* Removed unused (e) */ { return 'Data Inválida'; }
     };
 
     // --- Render ---

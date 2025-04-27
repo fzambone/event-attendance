@@ -24,25 +24,26 @@ export async function POST(request: NextRequest) {
                 INSERT INTO events (id, name, date)
                 VALUES (${eventId.trim()}, ${name.trim()}, ${date.trim()})
             `;
-        } catch (error: any) {
+        } catch (error: unknown) {
             // Check for unique constraint violation (duplicate eventId)
-            if (error.code === '23505') { // PostgreSQL unique violation error code
+            if (error instanceof Error && error.message.includes('23505')) { // PostgreSQL unique violation error code
                  return NextResponse.json({ message: `O ID de evento "${eventId}" já existe.` }, { status: 409 }); // 409 Conflict
             }
-             // Re-throw other database errors
+             // Re-throw other database errors or handle them
             throw error;
         }
 
         // Return the newly created event info
         return NextResponse.json({ message: 'Evento criado com sucesso!', eventId: eventId, event: { name, date } }, { status: 201 });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('API Create Event Error:', error);
         if (error instanceof SyntaxError) {
              return NextResponse.json({ message: 'Formato JSON inválido no corpo da requisição.' }, { status: 400 });
         }
-        // Handle potential database errors passed up
-        return NextResponse.json({ message: error.message || 'Erro Interno do Servidor ao criar evento.' }, { status: 500 });
+        // Handle potential database errors passed up or thrown
+        const message = error instanceof Error ? error.message : 'Erro Interno do Servidor ao criar evento.';
+        return NextResponse.json({ message }, { status: 500 });
     }
 }
 
@@ -69,9 +70,10 @@ export async function DELETE(request: NextRequest) {
         // Success (ON DELETE CASCADE handles confirmations automatically)
         return NextResponse.json({ message: 'Evento e suas confirmações foram excluídos com sucesso!' }, { status: 200 });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('API Delete Event Error:', error);
         // Handle potential database errors
-        return NextResponse.json({ message: error.message || 'Erro Interno do Servidor ao excluir evento.' }, { status: 500 });
+        const message = error instanceof Error ? error.message : 'Erro Interno do Servidor ao excluir evento.';
+        return NextResponse.json({ message }, { status: 500 });
     }
 }
