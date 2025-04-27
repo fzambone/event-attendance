@@ -7,8 +7,8 @@ export default function HomePage() {
         <h1 className="text-3xl font-semibold text-gray-800 mb-4">
           Confirmação de Presença em Eventos
         </h1>
-        <p className="text-gray-600 mb-6">
-          Esta aplicação gerencia confirmações de presença para diversos eventos.
+        <p className="text-gray-600 mb-6 text-left">
+          Esta aplicação gerencia confirmações de presença para diversos eventos.<br/><br/>
           Cada evento possui um link de confirmação único (ex: `/confirm/nome-do-evento`).
         </p>
         <Link
@@ -20,6 +20,7 @@ export default function HomePage() {
       </main>
       <footer className="mt-8 text-center text-gray-500 text-sm">
         Uma ferramenta simples para gerenciar presenças em eventos.
+        <br/><a href="https://www.github.com/fzambone" target="_blank" rel="noopener noreferrer">Criada por: Fernando R. Zambone</a>
       </footer>
     </div>
   );
