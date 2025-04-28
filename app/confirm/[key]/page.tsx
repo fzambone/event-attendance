@@ -179,8 +179,14 @@ export default function ConfirmPage() {
                             Número de Pessoas (incluindo você)
                         </label>
                         <input
-                            type="number" id="guests" value={guests} onChange={(e) => setGuests(Math.max(1, parseInt(e.target.value) || 1))}
-                            min="1" required
+                            type="tel"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            id="guests"
+                            value={guests}
+                            onChange={(e) => setGuests(Math.max(1, parseInt(e.target.value.replace(/[^0-9]/g, ''), 10) || 1))}
+                            min="1"
+                            required
                             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-gray-900"
                         />
                     </div>
