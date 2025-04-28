@@ -28,10 +28,36 @@ export default function ConfirmPage() {
     const [eventError, setEventError] = useState<string | null>(null);
 
     const [name, setName] = useState('');
-    const [guests, setGuests] = useState(1);
+    const [guests, setGuests] = useState(1); // State for validated number >= 1
+    const [guestsInputValue, setGuestsInputValue] = useState<string>('1'); // State for input display
     const [submitted, setSubmitted] = useState(false);
     const [submitError, setSubmitError] = useState(''); // Renamed from 'error'
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // --- Event Handlers ---
+
+    // Update guests input value and validated guests state
+    const handleGuestsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const rawValue = e.target.value;
+        const numericValue = rawValue.replace(/[^0-9]/g, ''); // Allow only digits
+
+        setGuestsInputValue(numericValue); // Update display value (can be empty string)
+
+        const parsedGuests = parseInt(numericValue, 10);
+        if (!isNaN(parsedGuests) && parsedGuests >= 1) {
+            setGuests(parsedGuests); // Update internal state if valid and >= 1
+            setSubmitError(''); // Clear error if input becomes valid
+        } else {
+            // If input is empty or <= 0, don't update internal 'guests' state immediately
+            // Keep it at the last valid value (or 1 initially)
+            // Optionally set an error or rely on submit validation
+        }
+    };
+
+    useEffect(() => {
+        // Initialize input value when component mounts
+        setGuestsInputValue(String(guests));
+    }, []); // Run only once
 
     // Fetch event details when component mounts or eventId changes
     useEffect(() => {
@@ -81,14 +107,20 @@ export default function ConfirmPage() {
             setIsSubmitting(false);
             return;
         }
-        if (guests < 1) {
+        // Validate guests specifically on submit, using the display value
+        const parsedGuests = parseInt(guestsInputValue, 10);
+        if (isNaN(parsedGuests) || parsedGuests < 1) {
             setSubmitError('O número de convidados deve ser pelo menos 1.');
             setIsSubmitting(false);
             return;
         }
+        // Ensure internal state matches validated input value before submit
+        if (guests !== parsedGuests) {
+             setGuests(parsedGuests);
+        }
 
         try {
-            const dataToSend = { name, guests, eventId }; // Include eventId
+            const dataToSend = { name, guests: parsedGuests, eventId };
             console.log('Data being sent to API:', dataToSend);
 
             const response = await fetch('/api/confirm', {
@@ -183,10 +215,10 @@ export default function ConfirmPage() {
                             inputMode="numeric"
                             pattern="[0-9]*"
                             id="guests"
-                            value={guests}
-                            onChange={(e) => setGuests(Math.max(1, parseInt(e.target.value.replace(/[^0-9]/g, ''), 10) || 1))}
-                            min="1"
-                            required
+                            value={guestsInputValue} // Bind to display value state
+                            onChange={handleGuestsChange} // Use the new handler
+                            min="1" // Keep min for semantics
+                            required // Keep required for form semantics
                             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 text-gray-900"
                         />
                     </div>
